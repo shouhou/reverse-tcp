@@ -1,0 +1,8 @@
+{
+    "server": "ws://localhost",
+    "server_port": 9502,
+    "password": "HelloWorld",
+    "bindings": [
+        {"local": 80, "remote": 8080}
+    ]
+}
