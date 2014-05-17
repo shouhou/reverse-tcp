@@ -1,7 +1,9 @@
 (function() {
-  var binding, config, forwarding, io, port_l2r, port_r2l, socket, _i, _len, _ref;
+  var binding, config, forwarding, io, logger, port_l2r, port_r2l, socket, _i, _len, _ref;
 
   config = require('../config.json');
+
+  logger = require('./logging.js');
 
   forwarding = require('./forwarding.js').remote2local();
 
@@ -23,23 +25,23 @@
     port_r2l[binding.remote] = binding.local;
   }
 
-  console.log('connecting...');
+  logger.info('connecting...');
 
   socket.on('error', function(err) {
-    return console.log(err);
+    return logger.error(err.stack);
   });
 
   socket.on('connect', function() {
-    console.log('connected');
+    logger.info('connected');
     return config.bindings.forEach(function(binding) {
       return socket.emit('/forwarding/create', {
         port: binding.remote
       }, function(ack) {
         if (ack.ok) {
-          return console.log('established local:%d <-> public:%d', binding.local, binding.remote);
+          return logger.info('established local:%d <-> public:%d', binding.local, binding.remote);
         } else {
-          console.log('failed to establish local:%d <-> public:%d', binding.local, binding.remote);
-          return console.log(ack.error);
+          logger.error('failed to establish local:%d <-> public:%d', binding.local, binding.remote);
+          return logger.error(ack.error);
         }
       });
     });
@@ -55,7 +57,6 @@
     if (port_r2l[data.port] == null) {
       return;
     }
-    console.log('connect local:%d <-- public:%d', port_r2l[data.port], data.port);
     return forwarding.connect(socket, data.client_id, port_r2l[data.port]);
   });
 
@@ -73,7 +74,6 @@
     if (data.client_id == null) {
       return;
     }
-    console.log('close local:%d <-- public:%d', port_r2l[data.port], data.port);
     return forwarding.end(data.client_id);
   });
 

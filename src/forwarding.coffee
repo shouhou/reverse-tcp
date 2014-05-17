@@ -21,7 +21,7 @@ class Local2RemoteForwarding
     cb_flag = false
     server.on 'error', (err) ->
       if cb_flag
-        console.log err
+        logger.error err.stack
       else
         cb_flag = true
         if err.code is 'EADDRINUSE'
@@ -66,7 +66,6 @@ class Local2RemoteForwarding
 
       client.setNoDelay true
 
-      console.log 'client connected: public:%d', port
       socket.emit '/forwarding/connect',
         port:         port
         client_id:    client.__id
@@ -86,7 +85,6 @@ class Local2RemoteForwarding
           error:      err
 
       client.on 'close', =>
-        console.log 'client closed: public:%d', port
         delete @clients[client.__id]
         socket.emit '/forwarding/close',
           port:       port
@@ -120,7 +118,7 @@ class Remote2LocalForwarding
         client_id: client_id
 
     client.on 'error', (err) ->
-      console.log err
+      logger.error err.stack
 
     client.on 'close', =>
       delete @clients[client_id]

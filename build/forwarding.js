@@ -35,7 +35,7 @@
       cb_flag = false;
       server.on('error', function(err) {
         if (cb_flag) {
-          return console.log(err);
+          return logger.error(err.stack);
         } else {
           cb_flag = true;
           if (err.code === 'EADDRINUSE') {
@@ -95,7 +95,6 @@
           client.__id = _this.idgen.next();
           _this.clients[client.__id] = client;
           client.setNoDelay(true);
-          console.log('client connected: public:%d', port);
           socket.emit('/forwarding/connect', {
             port: port,
             client_id: client.__id,
@@ -117,7 +116,6 @@
             });
           });
           return client.on('close', function() {
-            console.log('client closed: public:%d', port);
             delete _this.clients[client.__id];
             return socket.emit('/forwarding/close', {
               port: port,
@@ -175,7 +173,7 @@
         });
       });
       client.on('error', function(err) {
-        return console.log(err);
+        return logger.error(err.stack);
       });
       return client.on('close', (function(_this) {
         return function() {

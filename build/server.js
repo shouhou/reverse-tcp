@@ -1,7 +1,9 @@
 (function() {
-  var config, forwarding, io;
+  var config, forwarding, io, logger;
 
   config = require('../config.json');
+
+  logger = require('./logging.js');
 
   forwarding = require('./forwarding.js').local2remote();
 
@@ -20,7 +22,6 @@
   });
 
   io.on('connection', function(socket) {
-    console.log('endpoint connected');
     socket.on('/forwarding/create', function(data, ack) {
       var port;
       if (data.port == null) {
@@ -41,13 +42,13 @@
       }
       return forwarding.create(port, socket, function(err) {
         if (err) {
-          console.log('failed to establish public:%d', port);
-          console.log(err.message);
+          logger.error('failed to establish public:%d', port);
+          logger.error(err.message);
           return ack({
             error: err.message
           });
         } else {
-          console.log('established public:%d', port);
+          logger.info('established public:%d', port);
           return ack({
             ok: true
           });
@@ -70,7 +71,6 @@
       return forwarding.end(data.client_id);
     });
     return socket.on('disconnect', function() {
-      console.log('endpoint disconnected');
       return forwarding.destroyAll(socket);
     });
   });

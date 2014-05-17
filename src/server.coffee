@@ -1,5 +1,6 @@
 config = require '../config.json'
 
+logger = require('./logging.js')
 forwarding = require('./forwarding.js').local2remote()
 
 io = require('socket.io')()
@@ -13,7 +14,7 @@ io.use (socket, next) ->
     next()
 
 io.on 'connection', (socket) ->
-  console.log 'endpoint connected'
+  
   socket.on '/forwarding/create', (data, ack) ->
     if not data.port?
       return ack error: 'missing port parameter'
@@ -27,11 +28,11 @@ io.on 'connection', (socket) ->
 
     forwarding.create port, socket, (err) ->
       if err
-        console.log 'failed to establish public:%d', port
-        console.log err.message
+        logger.error 'failed to establish public:%d', port
+        logger.error err.message
         return ack error: err.message
       else
-        console.log 'established public:%d', port
+        logger.info 'established public:%d', port
         return ack ok: true
 
   socket.on '/forwarding/data', (data) ->
@@ -44,5 +45,4 @@ io.on 'connection', (socket) ->
     forwarding.end data.client_id
 
   socket.on 'disconnect', ->
-    console.log 'endpoint disconnected'
     forwarding.destroyAll socket

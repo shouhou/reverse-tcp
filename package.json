@@ -5,6 +5,7 @@
         "socket.io": "~1.0",
         "socket.io-client": "~1.0",
         "flake-idgen": "*",
+        "winston": "*",
         "grunt": "*",
         "grunt-contrib-coffee": "*",
         "grunt-contrib-watch": "*"
