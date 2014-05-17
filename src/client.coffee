@@ -22,7 +22,7 @@ socket.on 'error', (err) ->
 
 socket.on 'connect', ->
   console.log 'connected'
-  for binding in config.bindings
+  config.bindings.forEach (binding) ->
     socket.emit '/forwarding/create', port: binding.remote, (ack) ->
       if ack.ok
         console.log 'established local:%d <-> public:%d', binding.local, binding.remote

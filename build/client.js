@@ -30,13 +30,9 @@
   });
 
   socket.on('connect', function() {
-    var _j, _len1, _ref1, _results;
     console.log('connected');
-    _ref1 = config.bindings;
-    _results = [];
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      binding = _ref1[_j];
-      _results.push(socket.emit('/forwarding/create', {
+    return config.bindings.forEach(function(binding) {
+      return socket.emit('/forwarding/create', {
         port: binding.remote
       }, function(ack) {
         if (ack.ok) {
@@ -45,9 +41,8 @@
           console.log('failed to establish local:%d <-> public:%d', binding.local, binding.remote);
           return console.log(ack.error);
         }
-      }));
-    }
-    return _results;
+      });
+    });
   });
 
   socket.on('/forwarding/connect', function(data) {
