@@ -13,6 +13,15 @@ io.use (socket, next) ->
   else
     next()
 
+#           TCP               socket.io
+# User <-----------> Server <-----------> Client(behind NAT)
+# remote                                  local
+#
+# when User connect Server:
+#    Server => Client: /forwarding/connect
+# when User send data to Server:
+#    Server => Client: /forwarding/data
+
 io.on 'connection', (socket) ->
   
   socket.on '/forwarding/create', (data, ack) ->
